@@ -51,10 +51,10 @@ export default function Room({
 				return;
 			}
 
-			let fetchedTeams = await getTeamsFromRoom(roomObj._id);
+			let fetchedTeams = await getTeamsFromRoom(roomObj._id, authToken);
 			fetchedTeams = await Promise.all(
 				fetchedTeams.map(async (team) => {
-					const players = await getPlayersFromRoom(team.roomId, team._id);
+					const players = await getPlayersFromRoom(team.roomId, team._id, authToken);
 					team.players = players;
 					return team;
 				})
@@ -113,6 +113,9 @@ export default function Room({
 		teams.forEach(async (team) => {
 			if (team._id === teamId && team.players.length < maxUsers) {
 				const teamToJoin = await joinTeam(userId, teamId, cookies.access_token);
+				if(!teamToJoin._id){
+					return;
+				}
 				setTeam(teams.find((team) => team._id == teamToJoin.teamId));
 			}
 			return team;
